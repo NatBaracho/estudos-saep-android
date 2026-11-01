@@ -18,6 +18,10 @@ Funciona **sem internet**: todas as questões, explicações e aulas já vêm de
 
 ## Como instalar no celular
 
+📲 **Guia completo, com o que fazer em cada aviso, o caminho por marca de celular e solução de problemas: [INSTALAR_NO_CELULAR.md](INSTALAR_NO_CELULAR.md)**
+
+Resumo:
+
 1. No celular, abra a página [**Releases**](https://github.com/NatBaracho/estudos-saep-android/releases/latest) deste repositório.
    O repositório é privado, então entre na sua conta do GitHub antes.
 2. Toque em **EstudosSAEP.apk** para baixar.

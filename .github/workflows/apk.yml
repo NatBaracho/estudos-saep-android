@@ -4,6 +4,7 @@ name: Gerar APK
 on:
   push:
     branches: [main]
+    paths-ignore: ["**.md"]   # mudança só na documentação não gera APK novo
   workflow_dispatch:
 
 permissions:
