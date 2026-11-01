@@ -8,8 +8,11 @@
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="icone.png">
   <link rel="apple-touch-icon" href="icone.png">
-  <link rel="stylesheet" href="style.css?v=12">
-  <link rel="stylesheet" href="professor.css?v=12">
+  <!-- Tema escuro é o padrão; o botão 🌙/☀️ troca e a escolha fica salva -->
+  <script>try { document.documentElement.dataset.tema = localStorage.getItem("tema") || "escuro"; } catch (e) { document.documentElement.dataset.tema = "escuro"; }</script>
+  <meta name="theme-color" content="#171e29">
+  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="professor.css?v=13">
   <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
@@ -21,6 +24,7 @@
       <button data-aba="evolucao">📈 Evolução</button>
     </nav>
     <div id="relogio" class="relogio" hidden>⏱ <span>2:00:00</span></div>
+    <button id="trocar-tema" class="btn-tema" type="button" title="Trocar tema claro/escuro" aria-label="Trocar tema claro/escuro">☀️</button>
   </header>
 
   <div id="aviso-chave" class="aviso" hidden></div>
@@ -60,8 +64,8 @@
 
   <script src="local-api.js"></script>
 
-  <script src="professor.js?v=12"></script>
-  <script src="ambiente.js?v=12"></script>
-  <script src="app.js?v=12"></script>
+  <script src="professor.js?v=13"></script>
+  <script src="ambiente.js?v=13"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

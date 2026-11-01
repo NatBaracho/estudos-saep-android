@@ -485,3 +485,22 @@ document.addEventListener("click", (e) => {
   if (img) abrirLupa(img.getAttribute("src"));
 }, true);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelector(".lupa")?.remove(); });
+
+// Tema claro/escuro: o escuro é o padrão (no PC e no celular); a escolha fica salva no aparelho
+(function () {
+  const botao = document.getElementById("trocar-tema");
+  const raiz = document.documentElement;
+  const cor = document.querySelector('meta[name="theme-color"]');
+  const mostrar = () => {
+    const escuro = raiz.dataset.tema === "escuro";
+    botao.textContent = escuro ? "☀️" : "🌙";
+    botao.title = escuro ? "Mudar para o tema claro" : "Mudar para o tema escuro";
+    if (cor) cor.content = escuro ? "#171e29" : "#ffffff";
+  };
+  botao.addEventListener("click", () => {
+    raiz.dataset.tema = raiz.dataset.tema === "escuro" ? "claro" : "escuro";
+    try { localStorage.setItem("tema", raiz.dataset.tema); } catch (e) { /* sem armazenamento: vale só agora */ }
+    mostrar();
+  });
+  mostrar();
+})();
