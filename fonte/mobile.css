@@ -1,0 +1,36 @@
+/* Ajustes do app de celular (vem depois do style.css do PC) */
+html { -webkit-text-size-adjust: 100%; }
+body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+.btn, .alternativa, nav button, .grade button, .tema-card { touch-action: manipulation; }
+.dica { display: none; } /* atalhos de teclado não existem no celular */
+main { padding-bottom: 110px; } /* espaço para o professor no canto */
+
+@media (max-width: 600px) {
+  main { padding: 12px 10px 110px; }
+  .card { padding: 14px; border-radius: 12px; }
+  .centro { margin: 16px auto; }
+  .topo { gap: 6px; padding: 8px 10px; }
+  .marca { font-size: .95rem; }
+  nav { flex-basis: 100%; order: 3; justify-content: space-between; }
+  nav button { flex: 1; padding: 8px 4px; font-size: .9rem; }
+  .relogio { margin-left: auto; }
+  .alternativa { padding: 14px 12px; } /* alvo maior para o dedo */
+  .navegacao .btn { flex: 1; padding: 12px; }
+  .grade { grid-template-columns: repeat(8, 1fr); gap: 4px; }
+  .grade button { padding: 8px 0; }
+  .selo-nota { min-width: 0; width: 100%; }
+  .placar { gap: 14px; }
+  .cards4 .valor { font-size: 1.4rem; }
+  .aula-topo h1 { font-size: 1.3rem; }
+  .heroi-mini { width: 56px; height: 56px; }
+  .acoes-estudo .btn { width: 100%; }
+  .btn.grande { width: 100%; }
+  table { font-size: .82rem; }
+  th, td { padding: 6px 3px; }
+  .filtros .btn { flex: 1; }
+}
+
+/* Barra de status e barra de gestos do Android (o app ocupa a tela toda) */
+.topo { padding-top: calc(8px + max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px))); }
+main { padding-bottom: calc(110px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px))); }
+.prof { bottom: calc(12px + max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px))); }

@@ -1,0 +1,5 @@
+node_modules/
+# O projeto Android é gerado pelo GitHub Actions a cada build (npx cap add android)
+android/
+*.apk
+.assinatura/

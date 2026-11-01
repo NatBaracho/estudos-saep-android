@@ -1,0 +1,75 @@
+# Gera o APK do app a cada push na main e publica em Releases (o link "latest" sempre aponta para o mais novo).
+name: Gerar APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Criar o projeto Android, ícones e copiar a tela
+        run: |
+          npx cap add android
+          npx capacitor-assets generate --android --iconBackgroundColor '#1d5fd1' --splashBackgroundColor '#1d5fd1'
+          npx cap sync android
+          # versão sobe a cada build, para o Android aceitar a atualização por cima
+          sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
+      - name: Compilar e assinar o APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_SENHA: ${{ secrets.KEYSTORE_SENHA }}
+        run: |
+          cd android
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            # Assinatura fixa: cada versão nova instala por cima da anterior, sem perder o progresso
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/saep.p12"
+            ./gradlew assembleRelease --no-daemon \
+              -Pandroid.injected.signing.store.file="$RUNNER_TEMP/saep.p12" \
+              -Pandroid.injected.signing.store.password="$KEYSTORE_SENHA" \
+              -Pandroid.injected.signing.key.alias=saep \
+              -Pandroid.injected.signing.key.password="$KEYSTORE_SENHA"
+            cp app/build/outputs/apk/release/app-release.apk "$GITHUB_WORKSPACE/EstudosSAEP.apk"
+          else
+            # Sem a chave nos secrets: APK de teste (cada build tem assinatura diferente;
+            # para atualizar será preciso desinstalar antes). Veja "Assinatura do APK" no README.
+            echo "::warning::Secrets KEYSTORE_BASE64/KEYSTORE_SENHA não configurados: gerando APK de teste."
+            ./gradlew assembleDebug --no-daemon
+            cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/EstudosSAEP.apk"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EstudosSAEP-apk
+          path: EstudosSAEP.apk
+
+      - name: Publicar em Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.0.${{ github.run_number }}" EstudosSAEP.apk \
+            --title "Estudos SAEP 1.0.${{ github.run_number }}" \
+            --notes "APK do app. No celular: baixe o EstudosSAEP.apk e toque nele para instalar (permita 'instalar apps desconhecidos')." \
+            --latest

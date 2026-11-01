@@ -1,0 +1,105 @@
+/* =========================================================
+   Professor animado (janela flutuante) — usa as cores do style.css
+   ========================================================= */
+.prof { position: fixed; right: 20px; bottom: 20px; z-index: 50; }
+
+/* --- Avatar minimizado --- */
+.prof-avatar { position: relative; width: 84px; height: 84px; padding: 0; border: 3px solid var(--primaria); border-radius: 50%;
+  background: var(--card); box-shadow: 0 6px 20px rgba(16, 24, 40, .25); cursor: pointer; overflow: hidden;
+  animation: prof-flutua 3.2s ease-in-out infinite; transition: transform .15s; }
+.prof-avatar:hover { transform: scale(1.07); }
+.prof-avatar .prof-desenho, .prof-avatar svg { display: block; width: 100%; height: 100%; }
+.prof-ponto { position: absolute; top: 6px; right: 6px; width: 14px; height: 14px; border-radius: 50%;
+  background: #e5484d; border: 2px solid var(--card); display: none; }
+.prof.novidade .prof-ponto { display: block; animation: prof-pulsa 1s ease-in-out infinite; }
+.prof.novidade .prof-avatar { animation: prof-pula .6s ease-in-out 2, prof-flutua 3.2s ease-in-out 1.2s infinite; }
+
+/* --- Balão de fala --- */
+.prof-balao { position: absolute; right: 8px; bottom: 100px; width: max-content; max-width: min(300px, 80vw);
+  background: var(--card); color: var(--texto); border: 2px solid var(--primaria); border-radius: 16px 16px 4px 16px;
+  padding: 10px 14px; font-size: .92rem; box-shadow: 0 6px 20px rgba(16, 24, 40, .2); cursor: pointer;
+  animation: prof-aparece .35s cubic-bezier(.2, 1.4, .4, 1); }
+.prof-balao p { margin: 0; }
+.prof-balao::after { content: ""; position: absolute; right: 22px; bottom: -10px; border: 8px solid transparent;
+  border-top-color: var(--primaria); border-bottom: 0; }
+
+/* --- Janela aberta --- */
+.prof-painel { display: none; flex-direction: column; width: 370px; height: min(560px, calc(100vh - 110px));
+  background: var(--card); border: 1px solid var(--borda); border-radius: 18px; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(16, 24, 40, .3); animation: prof-aparece .3s cubic-bezier(.2, 1.3, .4, 1); transform-origin: bottom right; }
+.prof.aberto .prof-painel { display: flex; }
+.prof.aberto .prof-avatar, .prof.aberto .prof-balao { display: none; }
+
+.prof-topo { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--primaria); color: var(--primaria-texto); }
+.prof-mini { width: 52px; height: 52px; border-radius: 50%; background: var(--card); overflow: hidden; flex: none; border: 2px solid var(--primaria-texto); }
+.prof-mini svg { width: 100%; height: 100%; display: block; }
+.prof-titulo { flex: 1; display: flex; flex-direction: column; line-height: 1.2; }
+.prof-titulo span { font-size: .78rem; opacity: .85; }
+.prof-minimizar { border: 0; background: rgba(255, 255, 255, .18); color: inherit; width: 34px; height: 34px; border-radius: 50%;
+  font: 700 1rem/1 system-ui; cursor: pointer; }
+.prof-minimizar:hover { background: rgba(255, 255, 255, .32); }
+
+.prof-msgs { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+.prof-msg { max-width: 88%; padding: 9px 13px; border-radius: 14px; font-size: .93rem; animation: prof-aparece .25s ease-out; }
+.prof-msg.professor { align-self: flex-start; background: var(--card); border: 1px solid var(--borda); border-bottom-left-radius: 4px; }
+.prof-msg.aluno { align-self: flex-end; background: var(--primaria); color: var(--primaria-texto); border-bottom-right-radius: 4px; white-space: pre-wrap; }
+.prof-msg p { margin: 6px 0; } .prof-msg p:first-child { margin-top: 0; } .prof-msg p:last-child { margin-bottom: 0; }
+.prof-msg ul { margin: 4px 0; padding-left: 20px; }
+
+.prof-atalhos { display: flex; gap: 6px; padding: 8px 12px 0; flex-wrap: wrap; }
+.prof-atalhos button { font: inherit; font-size: .82rem; border: 1px solid var(--borda); background: var(--suave); color: var(--primaria);
+  border-radius: 99px; padding: 5px 12px; cursor: pointer; }
+.prof-atalhos button:hover { border-color: var(--primaria); }
+.prof-form { display: flex; gap: 8px; padding: 10px 12px 12px; }
+.prof-form textarea { flex: 1; font: inherit; font-size: .93rem; padding: 9px 11px; border-radius: 12px; border: 1px solid var(--borda);
+  background: var(--bg); color: var(--texto); resize: none; }
+.prof-form button { width: 44px; border: 0; border-radius: 12px; background: var(--primaria); color: var(--primaria-texto); font-size: 1.1rem; cursor: pointer; }
+
+/* --- Animações do personagem --- */
+.prof-fundo { fill: var(--suave); }
+.prof-svg .prof-corpo { animation: prof-respira 3.4s ease-in-out infinite; transform-box: view-box; transform-origin: 60px 118px; }
+.prof-svg .prof-olhos { animation: prof-pisca 4.5s infinite; transform-box: fill-box; transform-origin: center; }
+.prof-svg .prof-brilho path { animation: prof-cintila 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.prof-svg .prof-brilho path:nth-child(2) { animation-delay: 1.2s; }
+.prof-svg .prof-chapeu { transform-box: view-box; transform-origin: 60px 36px; }
+.prof-svg .prof-braco { transform-box: view-box; transform-origin: 86px 98px; animation: prof-gesto 6s ease-in-out infinite; }
+.prof-svg .prof-boca { transform-box: fill-box; transform-origin: center; transform: scaleY(.55); }
+.prof-svg .prof-cabeca { transform-box: view-box; transform-origin: 60px 82px; animation: prof-inclina 7s ease-in-out infinite; }
+
+.prof.acenando .prof-braco { animation: prof-acena .45s ease-in-out 5 alternate; }
+.prof.acenando .prof-chapeu { animation: prof-tira-chapeu 1.2s ease-in-out 2; }
+.prof.falando .prof-boca { animation: prof-fala .18s ease-in-out infinite alternate; }
+.prof[data-humor="feliz"] .prof-sobrancelha { transform: translateY(-2px); }
+.prof[data-humor="alerta"] .prof-avatar { border-color: var(--alerta); }
+
+@keyframes prof-flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes prof-pula { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-14px) scale(1.06); } }
+@keyframes prof-pulsa { 50% { transform: scale(1.3); } }
+@keyframes prof-aparece { from { opacity: 0; transform: scale(.85) translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes prof-respira { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015, 1.03); } }
+@keyframes prof-pisca { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes prof-cintila { 0%, 100% { transform: scale(.6); opacity: .4; } 50% { transform: scale(1.2); opacity: 1; } }
+@keyframes prof-tira-chapeu { 0%, 100% { transform: none; } 40%, 60% { transform: translateY(-7px) rotate(-8deg); } }
+@keyframes prof-balanca { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(6deg); } }
+@keyframes prof-gesto { 0%, 80%, 100% { transform: rotate(0); } 86% { transform: rotate(-14deg); } 92% { transform: rotate(4deg); } }
+@keyframes prof-acena { from { transform: rotate(10deg); } to { transform: rotate(-28deg); } }
+@keyframes prof-fala { from { transform: scaleY(.35); } to { transform: scaleY(1.25); } }
+@keyframes prof-inclina { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-3deg); } 60% { transform: rotate(2deg); } }
+
+/* --- Confete --- */
+.confete { position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden; }
+.confete i { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; animation: prof-cai linear forwards; }
+@keyframes prof-cai { to { top: 105vh; transform: rotate(720deg) translateX(40px); } }
+
+/* --- Celular: janela ocupa a largura toda --- */
+@media (max-width: 700px) {
+  .prof { right: 12px; bottom: 12px; }
+  .prof-avatar { width: 68px; height: 68px; }
+  .prof-balao { bottom: 82px; }
+  .prof.aberto { left: 8px; right: 8px; bottom: 8px; }
+  .prof-painel { width: 100%; height: calc(100vh - 90px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prof *, .prof-avatar, .confete i { animation: none !important; }
+}

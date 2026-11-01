@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d5fd1">
+  <title>Estudos SAEP</title>
+  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="professor.css?v=12">
+  <link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+  <header class="topo">
+    <div class="marca">📘 Estudos SAEP <span class="sub">Desenvolvimento de Sistemas</span></div>
+    <nav>
+      <button data-aba="prova" class="ativa">📝 Prova</button>
+      <button data-aba="estudo">📚 Estudar</button>
+      <button data-aba="evolucao">📈 Evolução</button>
+    </nav>
+    <div id="relogio" class="relogio" hidden>⏱ <span>2:00:00</span></div>
+  </header>
+
+  <div id="aviso-chave" class="aviso" hidden></div>
+
+  <main>
+    <section id="aba-prova"></section>
+    <section id="aba-estudo" hidden></section>
+    <section id="aba-evolucao" hidden></section>
+  </main>
+
+  <!-- Professor: janela flutuante no canto inferior direito -->
+  <div id="prof" class="prof">
+    <div class="prof-balao" hidden></div>
+    <button class="prof-avatar" title="Falar com o Professor" aria-label="Abrir o Professor">
+      <span class="prof-desenho"></span>
+      <span class="prof-ponto"></span>
+    </button>
+    <section class="prof-painel" aria-label="Professor">
+      <header class="prof-topo">
+        <span class="prof-desenho prof-mini"></span>
+        <div class="prof-titulo"><strong>Professor</strong><span>Desenvolvimento de Sistemas · SAEP</span></div>
+        <button class="prof-minimizar" title="Minimizar (Esc)" aria-label="Minimizar">—</button>
+      </header>
+      <div class="prof-msgs"></div>
+      <div class="prof-atalhos">
+        <button class="prof-dica">💡 Me dá uma dica</button>
+        <button class="prof-limpar">🧹 Limpar</button>
+      </div>
+      <form class="prof-form">
+        <textarea rows="2" placeholder="Escreva sua dúvida…"></textarea>
+        <button type="submit" aria-label="Enviar">➤</button>
+      </form>
+    </section>
+  </div>
+
+  <script src="dados.js"></script>
+
+  <script src="local-api.js"></script>
+
+  <script src="professor.js?v=12"></script>
+  <script src="ambiente.js?v=12"></script>
+  <script src="app.js?v=12"></script>
+</body>
+</html>
