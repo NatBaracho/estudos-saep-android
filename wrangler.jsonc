@@ -1,0 +1,11 @@
+// Site do Estudos SAEP na Cloudflare (Workers com arquivos estáticos).
+// Publica a pasta www/ (a mesma tela do app Android; o progresso fica no navegador de cada pessoa).
+// Publicar:  npm run site:publicar   (precisa ter feito "npx wrangler@4 login" uma vez)
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "estudos-saep",
+  "compatibility_date": "2026-11-04",
+  "assets": {
+    "directory": "www"
+  }
+}

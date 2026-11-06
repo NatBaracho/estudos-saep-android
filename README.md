@@ -6,6 +6,20 @@ Funciona **sem internet**: todas as questões, explicações e aulas já vêm de
 > 🔗 **Repositório principal (sistema do PC):** [NatBaracho/estudos-saep](https://github.com/NatBaracho/estudos-saep)
 > Este app é gerado a partir dele: as questões, as aulas e a tela são as mesmas.
 
+> 🌐 **Versão online (no navegador):** https://estudos-saep.estudos-saep-android.workers.dev
+> A mesma pasta `www/` publicada na Cloudflare. O progresso fica no navegador de cada pessoa.
+
+## Publicar o site online (Cloudflare)
+
+A configuração está em `wrangler.jsonc`: a Cloudflare serve a pasta `www/` como site estático, sem servidor e sem banco.
+
+```bash
+npx --yes wrangler@4 login     # só na primeira vez: autoriza a sua conta da Cloudflare no navegador
+npm run site:publicar           # envia a pasta www/ e atualiza o site
+```
+
+Para testar no PC antes de publicar: `npm run site:testar` (abre em http://localhost:8787).
+
 ## O que tem no app
 
 - 📝 **Provas de 40 questões** com cronômetro de 2 horas, iguais às do PC.
