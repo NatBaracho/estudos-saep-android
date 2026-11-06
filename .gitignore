@@ -3,10 +3,3 @@ node_modules/
 android/
 *.apk
 .assinatura/
-
-# wrangler files
-.wrangler
-.dev.vars*
-!.dev.vars.example
-.env*
-!.env.example

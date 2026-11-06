@@ -4,7 +4,7 @@ name: Gerar APK
 on:
   push:
     branches: [main]
-    paths-ignore: ["**.md", "wrangler.jsonc", ".github/workflows/site.yml"]   # documentação e site não geram APK novo
+    paths-ignore: ["**.md"]   # mudança só na documentação não gera APK novo
   workflow_dispatch:
 
 permissions:

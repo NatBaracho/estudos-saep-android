@@ -6,35 +6,8 @@ Funciona **sem internet**: todas as questões, explicações e aulas já vêm de
 > 🔗 **Repositório principal (sistema do PC):** [NatBaracho/estudos-saep](https://github.com/NatBaracho/estudos-saep)
 > Este app é gerado a partir dele: as questões, as aulas e a tela são as mesmas.
 
-> 🌐 **Versão online (no navegador):** https://estudos-saep.estudos-saep-android.workers.dev
-> A mesma pasta `www/` publicada na Cloudflare. O progresso fica no navegador de cada pessoa.
-
-## Publicar o site online (Cloudflare)
-
-A configuração está em `wrangler.jsonc`: a Cloudflare serve a pasta `www/` como site estático, sem servidor e sem banco.
-
-**Automático:** a cada push na `main` que mude a pasta `www/`, o GitHub Actions (`.github/workflows/site.yml`) publica o site sozinho, em cerca de 1 minuto.
-Ele usa o secret **`CLOUDFLARE_API_TOKEN`**. Sem esse secret, o fluxo só avisa e não publica.
-
-Para criar o token (uma vez):
-1. Na Cloudflare: **foto do perfil → My Profile → API Tokens → Create Token**.
-2. Escolha o modelo **Edit Cloudflare Workers** → **Use template**.
-3. Em **Account Resources**, escolha a sua conta. Em **Zone Resources**, deixe **All zones**.
-4. **Continue to summary → Create Token** e copie o token (ele só aparece uma vez).
-5. No PC, na pasta `AppAndroid`, grave no GitHub e cole o token quando pedir:
-
-```bash
-gh secret set CLOUDFLARE_API_TOKEN -R NatBaracho/estudos-saep-android
-```
-
-**Manual (pelo PC):**
-
-```bash
-npx --yes wrangler@4 login     # só na primeira vez: autoriza a sua conta da Cloudflare no navegador
-npm run site:publicar           # envia a pasta www/ e atualiza o site
-```
-
-Para testar no PC antes de publicar: `npm run site:testar` (abre em http://localhost:8787).
+> 🌐 **Versão web (no navegador):** [NatBaracho/estudos-saep-web](https://github.com/NatBaracho/estudos-saep-web) ·
+> https://estudos-saep.estudos-saep-android.workers.dev
 
 ## O que tem no app
 

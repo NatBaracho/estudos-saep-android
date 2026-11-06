@@ -6,9 +6,7 @@
   "scripts": {
     "android:criar": "cap add android",
     "android:icones": "capacitor-assets generate --android",
-    "android:sync": "cap sync android",
-    "site:publicar": "npx --yes wrangler@4 deploy",
-    "site:testar": "npx --yes wrangler@4 dev"
+    "android:sync": "cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "8.6.0",
