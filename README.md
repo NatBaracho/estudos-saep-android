@@ -6,14 +6,16 @@ Funciona **sem internet**: todas as questões, explicações e aulas já vêm de
 > 🔗 **Repositório principal (sistema do PC):** [NatBaracho/estudos-saep](https://github.com/NatBaracho/estudos-saep)
 > Este app é gerado a partir dele: as questões, as aulas e a tela são as mesmas.
 
-> 🌐 **Versão web (no navegador):** [NatBaracho/estudos-saep-web](https://github.com/NatBaracho/estudos-saep-web) ·
+> 🌐 **Versão web (no navegador, com login e banco na nuvem):** [NatBaracho/estudos-saep-web](https://github.com/NatBaracho/estudos-saep-web) ·
 > https://estudos-saep.estudos-saep-android.workers.dev
 
 ## O que tem no app
 
 - 📝 **Provas de 40 questões** com cronômetro de 2 horas, iguais às do PC.
 - 🎯 **Nota de 0 a 10**, com média **7,5** para aprovação.
-- 🔁 **Repetição do que você errou:** cada prova nova traz até 8 questões que você errou antes.
+- 🆕 **Sem repetir questões:** cada prova traz só questões que você ainda não viu.
+- 🔁 **Reforço a cada 3 provas:** a prova seguinte traz 4 questões (10%) das 3 anteriores, primeiro as que você errou.
+- 📚 **Todos os assuntos** em toda prova e 🎚️ **níveis alternados** (fácil, moderado, difícil, muito difícil), com a etiqueta colorida do nível em cada questão.
 - 🏆 **Seus destaques:** o tema em que você foi melhor e o que precisa reforçar.
 - 📚 **Estudar por tema:** aula do professor + treino de 10 questões com correção na hora.
 - 📈 **Evolução:** nota média, melhor nota e acerto por tema.
@@ -46,7 +48,9 @@ tools/exportar_app.py  (faz a cópia)            fonte/local-api.js  (faz o pape
                                                 fonte/mobile.css    (ajustes para celular)
 ```
 
-- A tela do PC chama `fetch("/api/...")`. No app, o `fonte/local-api.js` intercepta essas chamadas e responde com as mesmas regras do servidor (`ProvaService.cs`), guardando as provas no `localStorage` do aparelho.
+- A tela do PC chama `fetch("/api/...")`. No app, o `fonte/local-api.js` intercepta essas chamadas e responde com as mesmas regras do servidor (`ProvaService.cs` e `MontadorProva.cs`), guardando as provas no `localStorage` do aparelho.
+- As rotas e respostas estão documentadas em [estudos-saep-web/docs/03-api.md](https://github.com/NatBaracho/estudos-saep-web/blob/main/docs/03-api.md),
+  e as regras de montagem das provas em [docs/regras-das-provas.md](https://github.com/NatBaracho/estudos-saep/blob/main/docs/regras-das-provas.md).
 - O app Android é feito com [Capacitor](https://capacitorjs.com) 8.
 - A pasta `android/` não fica no repositório: o **GitHub Actions** cria o projeto, gera os ícones (pasta `assets/`, com o desenho do professor), compila, **assina** o APK e publica em Releases a cada push na `main`.
 

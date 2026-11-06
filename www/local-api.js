@@ -9,12 +9,15 @@
   const D = window.DADOS;
   const Q = new Map(D.questoes.map((q) => [q.id, q]));
   const CHAVE = "saep-dados-v1";
-  const POR_PROVA = 40, DURACAO = 2 * 60 * 60, MAX_REPETIDAS = 8;
+  const POR_PROVA = 40, DURACAO = 2 * 60 * 60;
 
   let db;
   try { db = JSON.parse(localStorage.getItem(CHAVE)); } catch { db = null; }
-  if (!db || !Array.isArray(db.provas)) db = { seq: 0, provas: [] };
+  if (!db || !Array.isArray(db.provas)) db = { seq: 0, provas: [], regra: 2 };
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(db)); } catch { /* armazenamento cheio/bloqueado */ } };
+  // Regra nova de montagem (reforço a cada 3 provas, todos os assuntos, níveis alternados):
+  // a prova que já estava pronta (e não começou) é montada de novo
+  if (db.regra !== 2) { db.provas = db.provas.filter((p) => p.status !== "pronta"); db.regra = 2; salvar(); }
 
   const agora = () => new Date().toISOString();
   const embaralhar = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -41,35 +44,105 @@
     db.provas.push(p); salvar(); return p;
   }
 
-  // 1ª prova: 40 questões oficiais, priorizando as menos usadas
-  function provaOficial() {
-    const u = usos();
-    const ids = D.questoes.filter((q) => q.origem === "oficial")
-      .map((q) => ({ id: q.id, k: (u.get(q.id) || 0) + Math.random() * 0.5 }))
-      .sort((a, b) => a.k - b.k).slice(0, POR_PROVA).map((x) => x.id);
-    return criarProva(embaralhar(ids), "Prova com questões oficiais do SAEP.");
+  // ---------- Montagem da prova (mesma regra do PC: SistemaSAEP/Services/MontadorProva.cs) ----------
+  // 1. Só entram as questões que você menos viu (inéditas antes de todas): cobre o banco inteiro sem repetir.
+  // 2. Todos os assuntos entram, na proporção do tamanho de cada um (tema pequeno aparece pouco, para durar mais).
+  // 3. Os 4 níveis entram na proporção do que falta ver e se alternam na ordem (fácil, moderado, difícil, muito difícil...).
+  // As de reforço (repetidas) entram já escolhidas. Itens: { id, tema, nivel (1 a 4), usos }.
+  const CICLO_REFORCO = 3, QUESTOES_REFORCO = 4; // a cada 3 provas feitas, a próxima traz 4 delas para reforçar
+
+  function cotas(quantidades, n) {
+    const soma = quantidades.reduce((a, b) => a + b, 0);
+    if (!soma) return quantidades.map(() => 0);
+    const exato = quantidades.map((q) => (n * q) / soma);
+    const c = exato.map(Math.floor);
+    const faltam = n - c.reduce((a, b) => a + b, 0);
+    [...c.keys()].sort((a, b) => (exato[b] - c[b]) - (exato[a] - c[a])).slice(0, faltam).forEach((i) => c[i]++);
+    return c;
   }
 
-  // Próximas: até 8 que você errou (e não acertou depois) + as que você menos viu, com mais chance nos temas em que erra mais
+  function alternarNiveis(questoes) {
+    const grupos = {};
+    for (const q of questoes) (grupos[q.nivel] ??= []).push(q);
+    return Object.values(grupos)
+      .flatMap((g) => embaralhar(g).map((q, k) => ({ q, pos: k / g.length })))
+      .sort((a, b) => a.pos - b.pos || a.q.nivel - b.q.nivel)
+      .map((x) => x.q.id);
+  }
+
+  function montarProva(banco, repetidas, total) {
+    const escolhidas = [...repetidas], porTema = {}, porNivel = [0, 0, 0, 0, 0];
+    const contar = (c) => { porTema[c.tema] = (porTema[c.tema] || 0) + 1; porNivel[c.nivel]++; };
+    repetidas.forEach(contar);
+    const ja = new Set(repetidas.map((r) => r.id));
+    const faltam = Math.max(0, total - escolhidas.length);
+    const livres = embaralhar(banco.filter((c) => !ja.has(c.id))).sort((a, b) => a.usos - b.usos);
+    if (!faltam || !livres.length) return alternarNiveis(escolhidas);
+
+    const corte = livres[Math.min(faltam, livres.length) - 1].usos;
+    const grupo = livres.filter((c) => c.usos <= corte).map((c) => ({ c, sorteio: Math.random() }));
+    const cota = cotas([1, 2, 3, 4].map((n) => grupo.filter((g) => g.c.nivel === n).length), faltam);
+    const tamTema = {};
+    for (const g of grupo) tamTema[g.c.tema] = (tamTema[g.c.tema] || 0) + 1;
+    const pegasNivel = [0, 0, 0, 0, 0];
+    const excesso = (c) => (pegasNivel[c.nivel] < cota[c.nivel - 1] ? 0 : 1);
+    const peso = (c) => ((porTema[c.tema] || 0) + 1) / tamTema[c.tema];
+    const melhor = (lista, ...chaves) => lista.reduce((m, g) => {
+      if (!m) return g;
+      for (const k of chaves) { const d = k(g) - k(m); if (d) return d < 0 ? g : m; }
+      return m;
+    }, null);
+    const pegar = (g) => { escolhidas.push(g.c); contar(g.c); pegasNivel[g.c.nivel]++; grupo.splice(grupo.indexOf(g), 1); };
+
+    // 1) Uma questão de cada tema que ainda não apareceu na prova
+    for (const tema of embaralhar(Object.keys(tamTema))) {
+      if (escolhidas.length >= total || porTema[tema]) continue;
+      pegar(melhor(grupo.filter((g) => g.c.tema === tema), (g) => g.c.usos, (g) => excesso(g.c), (g) => g.sorteio));
+    }
+    // 2) Completa respeitando as cotas de nível e a proporção dos temas
+    while (escolhidas.length < total && grupo.length)
+      pegar(melhor(grupo, (g) => g.c.usos, (g) => excesso(g.c), (g) => peso(g.c), (g) => g.sorteio));
+    return alternarNiveis(escolhidas);
+  }
+
+  function descreverProva(ineditas, reforco, revisao, temas) {
+    const partes = [];
+    if (ineditas > 0) partes.push(`${ineditas} questões que você ainda não viu`);
+    if (reforco > 0) partes.push(`${reforco} das últimas ${CICLO_REFORCO} provas para reforçar`);
+    if (revisao > 0) partes.push(ineditas > 0 ? `${revisao} de revisão (as inéditas acabaram)`
+      : `${revisao} de revisão: você já viu todas as questões, então voltam as que você viu menos vezes`);
+    return `${partes.join(" + ")}. ${temas} assuntos, com níveis alternados.`;
+  }
+
+  const candidatas = (filtro = () => true) => {
+    const u = usos();
+    return D.questoes.filter(filtro).map((q) => ({ id: q.id, tema: q.tema, nivel: Math.min(4, Math.max(1, q.nivel || 2)), usos: u.get(q.id) || 0 }));
+  };
+  const temasDe = (ids) => new Set(ids.map((id) => Q.get(id)?.tema)).size;
+
+  // 1ª prova (ou "só oficiais"): 40 questões oficiais, com todos os assuntos e níveis alternados
+  function provaOficial() {
+    const ids = montarProva(candidatas((q) => q.origem === "oficial"), [], POR_PROVA);
+    return criarProva(ids, `Prova com questões oficiais do SAEP: ${temasDe(ids)} assuntos, com níveis alternados.`);
+  }
+
+  // Reforço: depois de cada 3 provas feitas, a próxima traz 4 questões dessas 3 provas (primeiro as erradas)
+  function reforco(banco) {
+    const feitas = finalizadas();
+    if (!feitas.length || feitas.length % CICLO_REFORCO) return [];
+    const itens = new Map();
+    for (const p of feitas.slice(-CICLO_REFORCO)) for (const i of p.itens) itens.set(i.qid, Math.min(itens.get(i.qid) ?? 1, i.acertou ? 1 : 0));
+    const ids = embaralhar([...itens]).sort((a, b) => a[1] - b[1]).slice(0, QUESTOES_REFORCO).map(([qid]) => qid);
+    return banco.filter((c) => ids.includes(c.id));
+  }
+
   function proximaProva() {
     if (db.provas.some((p) => p.status === "pronta" || p.status === "andamento")) return;
-    const ultimo = new Map(); // qid -> { certo: data, errado: data }
-    for (const h of historico()) {
-      const x = ultimo.get(h.qid) ?? {}; x[h.acertou ? "certo" : "errado"] = h.em; ultimo.set(h.qid, x);
-    }
-    const repetidas = [...ultimo].filter(([, x]) => x.errado && (!x.certo || x.errado > x.certo))
-      .map(([qid, x]) => ({ qid, k: x.errado + Math.random() })).sort((a, b) => (a.k < b.k ? 1 : -1))
-      .slice(0, MAX_REPETIDAS).map((x) => x.qid);
-
-    const u = usos(), temas = desempenhoPorTema(), ja = new Set(repetidas);
-    const erro = (tema) => (temas[tema] ? 1 - temas[tema].acertos / temas[tema].total : 0.3);
-    const resto = D.questoes.filter((q) => !ja.has(q.id))
-      .map((q) => ({ id: q.id, usos: u.get(q.id) || 0, k: Math.random() * (1 + 2 * erro(q.tema)) }))
-      .sort((a, b) => a.usos - b.usos || b.k - a.k)
-      .slice(0, POR_PROVA - repetidas.length);
-    const ineditas = resto.filter((x) => x.usos === 0).length;
-    criarProva(embaralhar([...repetidas, ...resto.map((x) => x.id)]),
-      `${ineditas} questões que você ainda não viu + ${repetidas.length} que você errou antes.`);
+    const banco = candidatas(), repetidas = reforco(banco);
+    const ids = montarProva(banco, repetidas, POR_PROVA);
+    const usos = new Map(banco.map((c) => [c.id, c.usos]));
+    const ineditas = ids.filter((id) => usos.get(id) === 0).length;
+    criarProva(ids, descreverProva(ineditas, repetidas.length, ids.length - ineditas - repetidas.length, temasDe(ids)));
   }
 
   function finalizar(p) {
@@ -93,7 +166,7 @@
       respondidas: p.itens.filter((i) => i.resposta).length, total: p.itens.length };
   }
 
-  const campos = (q) => ({ questaoId: q.id, tema: q.tema, enunciado: q.enunciado, altA: q.a, altB: q.b, altC: q.c, altD: q.d, imagem: q.imagem ?? null });
+  const campos = (q) => ({ questaoId: q.id, tema: q.tema, nivel: q.nivel ?? 2, enunciado: q.enunciado, altA: q.a, altB: q.b, altC: q.c, altD: q.d, imagem: q.imagem ?? null });
 
   // ---------- Rotas (as mesmas do servidor do PC) ----------
   const rotas = [

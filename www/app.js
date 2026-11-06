@@ -71,7 +71,7 @@ async function atualizar() {
       <h1>${primeira ? "Vamos começar? 🚀" : "Pronto para mais uma? 💪"}</h1>
       <p class="muted">${primeira
         ? "Sua primeira prova tem <strong>40 questões oficiais do SAEP</strong>, com 4 alternativas cada. Você terá <strong>2 horas</strong>."
-        : "O professor monta uma prova nova com 40 questões, repetindo as que você errou."}</p>
+        : "O professor monta uma prova nova com 40 questões de todos os assuntos, alternando os níveis de dificuldade. A cada 3 provas, 4 questões voltam para reforçar."}</p>
       <div class="acoes"><button class="btn primario grande" id="nova">🎲 Gerar prova</button></div>
       <div class="passos"><span>1️⃣ Gere a prova</span><span>2️⃣ Clique em Iniciar</span><span>3️⃣ Responda em até 2h</span><span>4️⃣ Aprenda com a correção</span></div></div>`;
     $("#nova").onclick = () => novaProva(false);
@@ -96,6 +96,10 @@ async function atualizar() {
     $("#iniciar").onclick = async () => { await abrirProva(await api(`/api/provas/${p.id}/iniciar`, { method: "POST" })); Prof.reagir("provaIniciada"); };
   }
 }
+
+// Nível de dificuldade da questão (1 a 4)
+const NIVEIS = { 1: "Fácil", 2: "Moderado", 3: "Difícil", 4: "Muito difícil" };
+const nivelHTML = (n) => (NIVEIS[n] ? `<span class="tag nivel nivel-${n}">${NIVEIS[n]}</span>` : "");
 
 async function novaProva(oficial) {
   $("#aba-prova").innerHTML = `<div class="card centro"><div class="spinner"></div><p>Preparando…</p></div>`;
@@ -135,7 +139,7 @@ function desenharProva() {
   const alts = [q.altA, q.altB, q.altC, q.altD];
   $("#aba-prova").innerHTML = `<div class="prova">
     <div class="card questao">
-      <div class="meta"><span>Questão ${q.ordem} de ${total}</span><span class="tag">${esc(q.tema)}</span></div>
+      <div class="meta"><span>Questão ${q.ordem} de ${total}</span><span class="tags">${nivelHTML(q.nivel)}<span class="tag">${esc(q.tema)}</span></span></div>
       <div class="enunciado">${esc(q.enunciado)}</div>${figuraHTML(q.imagem)}
       ${alts.map((a, i) => `<button class="alternativa ${q.resposta === LETRAS[i] ? "marcada" : ""}" data-l="${LETRAS[i]}">
         <span class="letra">${LETRAS[i]}</span><span>${altHTML(a)}</span></button>`).join("")}
@@ -287,7 +291,7 @@ function desenharRevisoes(itens) {
     const alts = [i.altA, i.altB, i.altC, i.altD];
     return `<div class="card revisao ${i.acertou ? "acerto" : ""}" data-q="${i.questaoId}">
       <div class="meta muted" style="display:flex;justify-content:space-between"><span>Questão ${i.ordem} · ${i.acertou ? "✅ acertou" : i.resposta ? `❌ você marcou ${i.resposta}` : "⚪ em branco"}</span>
-      <span class="tag">${esc(i.tema)}${i.origem === "oficial" ? " · oficial" : ""}</span></div>
+      <span class="tags">${nivelHTML(i.nivel)}<span class="tag">${esc(i.tema)}${i.origem === "oficial" ? " · oficial" : ""}</span></span></div>
       <div class="enunciado">${esc(i.enunciado)}</div>${figuraHTML(i.imagem)}
       ${alts.map((a, n) => { const L = LETRAS[n]; const c = L === i.correta ? "certa" : L === i.resposta ? "errada" : "";
         return `<div class="alternativa ${c}" style="cursor:default"><span class="letra">${L}</span><span>${altHTML(a)}</span></div>`; }).join("")}
