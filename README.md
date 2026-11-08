@@ -7,7 +7,7 @@ Funciona **sem internet**: todas as questões, explicações e aulas já vêm de
 > Este app é gerado a partir dele: as questões, as aulas e a tela são as mesmas.
 
 > 🌐 **Versão web (no navegador, com login e banco na nuvem):** [NatBaracho/estudos-saep-web](https://github.com/NatBaracho/estudos-saep-web) ·
-> https://estudos-saep.estudos-saep-android.workers.dev
+> https://www.estudossaep.workers.dev
 
 ## O que tem no app
 
