@@ -7,7 +7,6 @@ Guia passo a passo para colocar o app no celular. Leva uns 5 minutos.
 - Celular **Android 7.0 ou mais novo**. O app não funciona no iPhone.
 - Uns **30 MB livres**.
 - Internet **só para baixar**. Depois, o app funciona sem internet.
-- Sua conta do **GitHub** (usuário `NatBaracho`), porque o repositório é privado.
 
 ## Jeito 1: baixar direto no celular (recomendado)
 
@@ -17,7 +16,7 @@ No navegador do celular (Chrome), abra:
 
 **https://github.com/NatBaracho/estudos-saep-android/releases/latest**
 
-Se aparecer **"404"** ou **"Page not found"**, é porque você não está logado. Toque em **Sign in**, entre com a sua conta do GitHub e abra o link de novo.
+Não precisa ter conta no GitHub: a página é pública.
 
 ### Passo 2: baixar o APK
 
@@ -91,7 +90,7 @@ Para saber qual versão você tem: segure o dedo no ícone do app → **Informa�
 
 | O que aparece | O que fazer |
 |---|---|
-| **404 / Page not found** ao abrir o link | Entre na sua conta do GitHub no navegador do celular e abra o link de novo. |
+| **404 / Page not found** ao abrir o link | Confira se o endereço foi digitado certinho: `github.com/NatBaracho/estudos-saep-android/releases/latest`. |
 | **"App não instalado"** ao atualizar | A versão nova tem uma assinatura diferente da instalada. Isso só acontece com as versões de teste. Desinstale o app antigo e instale de novo; o progresso será perdido. |
 | **"Pacote inválido" / "Erro de análise"** | O download não terminou. Apague o arquivo e baixe de novo. |
 | **Não acho o arquivo baixado** | Abra o Chrome → ⋮ → **Downloads**. |
